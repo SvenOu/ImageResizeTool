@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="600" prefWidth="1200" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.sv.image.tool.controller.MainUiController">
+    <AnchorPane>
+        <TabPane fx:id="tabPanel" prefHeight="400" prefWidth="1200">
+            <tabs>
+                <Tab closable="false" text="批量加圆角">
+                    <content>
+                        <VBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectOriginDir1" text="选中原图片文件夹"/>
+                                <TextField fx:id="tfSelectOriginDir1" prefHeight="23.0" prefWidth="763.0"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectTargetDir1" text="选中目标图片文件夹"/>
+                                <TextField fx:id="tfSelectTargetDir1" prefHeight="23.0" prefWidth="763.0"/>
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label  text="圆角角度："/>
+                                <TextField fx:id="tfCorner" prefHeight="23.0" prefWidth="763.0"/>
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </HBox>
+                            <Button fx:id="btnProgress1" mnemonicParsing="false" text="开始加圆角" >
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </Button>
+
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </padding>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="批量加边框">
+                    <content>
+                        <VBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectOriginDir2" text="选中原图片文件夹"/>
+                                <TextField fx:id="tfSelectOriginDir2" prefHeight="23.0" prefWidth="763.0"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectTargetDir2" text="选中目标图片文件夹"/>
+                                <TextField fx:id="tfSelectTargetDir2" prefHeight="23.0" prefWidth="763.0"/>
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </HBox>
+
+                            <Button fx:id="btnProgress2" mnemonicParsing="false" text="开始加边框" >
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </Button>
+
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </padding>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="批量剪切图片">
+                    <content>
+                        <VBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectOriginDir3" text="选中原图片文件夹"/>
+                                <TextField fx:id="tfSelectOriginDir3" prefHeight="23.0" prefWidth="763.0"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectTargetDir3" text="选中目标图片文件夹"/>
+                                <TextField fx:id="tfSelectTargetDir3" prefHeight="23.0" prefWidth="763.0"/>
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </HBox>
+
+                            <Button fx:id="btnProgress3" mnemonicParsing="false" text="开始剪切图片" >
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </Button>
+
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </padding>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="批量改变图片尺寸">
+                    <content>
+                        <VBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectOriginDir4" text="选中原图片文件夹"/>
+                                <TextField fx:id="tfSelectOriginDir4" prefHeight="23.0" prefWidth="763.0"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectTargetDir4" text="选中目标图片文件夹"/>
+                                <TextField fx:id="tfSelectTargetDir4" prefHeight="23.0" prefWidth="763.0"/>
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </HBox>
+
+                            <Button fx:id="btnProgress4" mnemonicParsing="false" text="开始改变图片尺寸" >
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </Button>
+
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </padding>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="批量旋转图片">
+                    <content>
+                        <VBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectOriginDir5" text="选中原图片文件夹"/>
+                                <TextField fx:id="tfSelectOriginDir5" prefHeight="23.0" prefWidth="763.0"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectTargetDir5" text="选中目标图片文件夹"/>
+                                <TextField fx:id="tfSelectTargetDir5" prefHeight="23.0" prefWidth="763.0"/>
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </HBox>
+
+                            <Button fx:id="btnProgress5" mnemonicParsing="false" text="开始旋转图片" >
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </Button>
+
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </padding>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="批量加滤镜特效">
+                    <content>
+                        <VBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectOriginDir6" text="选中原图片文件夹"/>
+                                <TextField fx:id="tfSelectOriginDir6" prefHeight="23.0" prefWidth="763.0"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Button fx:id="btnSelectTargetDir6" text="选中目标图片文件夹"/>
+                                <TextField fx:id="tfSelectTargetDir6" prefHeight="23.0" prefWidth="763.0"/>
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </HBox>
+
+                            <Button fx:id="btnProgress6" mnemonicParsing="false" text="开始加特效" >
+                                <VBox.margin>
+                                    <Insets top="10.0"/>
+                                </VBox.margin>
+                            </Button>
+
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </padding>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+
+        <HBox fx:id="loadingPanel" alignment="CENTER" prefHeight="400" prefWidth="1200"
+              style="-fx-background-color: rgba(0, 0, 0, 0.5);" visible="false">
+            <Label text="Loading...">
+                <font>
+                    <Font size="36.0"/>
+                </font>
+            </Label>
+        </HBox>
+    </AnchorPane>
+
+    <AnchorPane maxWidth="1200" prefHeight="200" prefWidth="1200">
+        <TextArea fx:id="consoleTa" editable="false" prefHeight="200" prefWidth="1200" style="-fx-control-inner-background:#cce6cf;   -fx-highlight-text-fill: #cce6cf;" wrapText="true"/>
+        <Button fx:id="clearProgressBtn" layoutX="1062.0" layoutY="14.0" mnemonicParsing="false" text="强制清理进程" textFill="red"/>
+    </AnchorPane>
+</VBox>
