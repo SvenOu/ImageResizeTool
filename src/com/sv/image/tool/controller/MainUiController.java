@@ -1,22 +1,35 @@
 package com.sv.image.tool.controller;
+
 import com.sv.image.tool.SvImageToolsApp;
 import com.sv.image.tool.bean.JavaProcess;
+import com.sv.image.tool.main.PersistenceSaver;
 import com.sv.image.tool.main.service.MainService;
 import com.sv.image.tool.main.service.impl.MainServiceImpl;
 import com.sv.image.tool.manager.ServiceManager;
-import com.sv.image.tool.utils.ImageUtil;
-import com.sv.image.tool.utils.JavaProcessHelper;
-import com.sv.image.tool.utils.JobTask;
-import com.sv.image.tool.utils.UIutils;
+import com.sv.image.tool.manager.callback.BindButtonCallback;
+import com.sv.image.tool.model.SystemModel;
+import com.sv.image.tool.utils.*;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.stage.DirectoryChooser;
+import org.imgscalr.Scalr;
 
+import java.awt.image.BufferedImageOp;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -35,12 +48,15 @@ public class MainUiController {
     public Button btnSelectTargetDir1;
     public TextField tfSelectTargetDir1;
     public Button btnProgress1;
+    public TextField tfCorner;
 
     //批量加边框
     public Button btnSelectOriginDir2;
     public TextField tfSelectOriginDir2;
     public Button btnSelectTargetDir2;
     public TextField tfSelectTargetDir2;
+    public ColorPicker cpBorder;
+    public TextField tfPadding;
     public Button btnProgress2;
 
     //批量剪切图片
@@ -49,6 +65,10 @@ public class MainUiController {
     public Button btnSelectTargetDir3;
     public TextField tfSelectTargetDir3;
     public Button btnProgress3;
+    public TextField tfCropx;
+    public TextField tfCropy;
+    public TextField tfCropWidth;
+    public TextField tfCropHeight;
 
     //批量改变图片尺寸
     public Button btnSelectOriginDir4;
@@ -63,6 +83,9 @@ public class MainUiController {
     public Button btnSelectTargetDir5;
     public TextField tfSelectTargetDir5;
     public Button btnProgress5;
+    public ChoiceBox<String> cbRotate;
+    private String[] rotateKeyArray;
+    private HashMap<String, Scalr.Rotation> rotateVals;
 
     //批量加滤镜
     public Button btnSelectOriginDir6;
@@ -70,23 +93,34 @@ public class MainUiController {
     public Button btnSelectTargetDir6;
     public TextField tfSelectTargetDir6;
     public Button btnProgress6;
+    public CheckBox cbFilterAnti;
+    public CheckBox cbFilterLight;
+    public CheckBox cbFilterDark;
+    public CheckBox cbFilterGray;
 
+    //控制台
     public Button clearProgressBtn;
 
+    public PersistenceSaver persistenceSaver;
+
     private MainService mainService;
+    private SystemModel systemModel;
 
     @FXML
     private void initialize() {
         ImageUtil.initLog(consoleTa);
+        persistenceSaver = new PersistenceSaver();
+        systemModel = persistenceSaver.loadModel(SystemModel.class, PersistenceSaver.SYSTEM_SAVE_PATH);
         mainService = ServiceManager.getInstance().getService(MainServiceImpl.class);
         initCommon();
+        initTab1();
+        initTab2();
+        initTab3();
+        initTab4();
+        initTab5();
+        initTab6();
 
-        new JobTask<Void>(){
-            @Override
-            protected void onPreCall() {
-                super.onPreCall();
-                loadingPanel.setVisible(true);
-            }
+        new LoadingTask<Void>() {
 
             @Override
             public Void onCall() {
@@ -122,18 +156,337 @@ public class MainUiController {
                 return null;
             }
 
-            @Override
-            protected void onDone(Void aVoid) {
-                super.onDone(aVoid);
-                loadingPanel.setVisible(false);
-            }
         }.excuteJob();
 
     }
 
+    private void initTab6() {
+        bindButtonTextfield("选择源图片文件夹", "必须选择一个文件夹", btnSelectOriginDir6, tfSelectOriginDir6, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setOriginPath6(path);
+            }
+        });
+        bindButtonTextfield("选择目标图片文件夹", "必须选择一个文件夹", btnSelectTargetDir6, tfSelectTargetDir6, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setTargetPath6(path);
+            }
+        });
+        cbFilterAnti.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                systemModel.setFilterAnti(newValue);
+                saveModels();
+            }
+        });
+        cbFilterLight.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                systemModel.setFilterLight(newValue);
+                saveModels();
+            }
+        });
+        cbFilterDark.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                systemModel.setFilterDarker(newValue);
+                saveModels();
+            }
+        });
+        cbFilterGray.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                systemModel.setFilterGray(newValue);
+                saveModels();
+            }
+        });
+
+        btnProgress6.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                new LoadingTask<Void>() {
+                    @Override
+                    public Void onCall() {
+                        List<BufferedImageOp> filters = new ArrayList();
+                        if(systemModel.isFilterAnti()){
+                            filters.add(Scalr.OP_ANTIALIAS);
+                        }
+                        if(systemModel.isFilterLight()){
+                            filters.add(Scalr.OP_BRIGHTER);
+                        }
+                        if(systemModel.isFilterDarker()){
+                            filters.add(Scalr.OP_DARKER);
+                        }
+                        if(systemModel.isFilterGray()){
+                            filters.add(Scalr.OP_GRAYSCALE);
+                        }
+                        BufferedImageOp[] array = new BufferedImageOp[filters.size()];
+                        for(int i =0; i< filters.size(); i++){
+                            BufferedImageOp op = filters.get(i);
+                            array[i] = op;
+                        }
+                        mainService.batchApplyImage(systemModel.getOriginPath6(),
+                                systemModel.getTargetPath6(),
+                                array);
+                        return null;
+                    }
+                }.excuteJob();
+            }
+        });
+    }
+
+    private void initTab5() {
+
+        bindButtonTextfield("选择源图片文件夹", "必须选择一个文件夹", btnSelectOriginDir5, tfSelectOriginDir5, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setOriginPath5(path);
+            }
+        });
+        bindButtonTextfield("选择目标图片文件夹", "必须选择一个文件夹", btnSelectTargetDir5, tfSelectTargetDir5, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setTargetPath5(path);
+            }
+        });
+
+        cbRotate.getSelectionModel().selectedIndexProperty()
+                .addListener(new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                        String key = rotateKeyArray[(int) newValue];
+                        systemModel.setRotateKey(key);
+                        saveModels();
+                    }
+                });
+
+        btnProgress5.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                new LoadingTask<Void>() {
+                    @Override
+                    public Void onCall() {
+                        mainService.batchRotateImage(systemModel.getOriginPath5(),
+                                systemModel.getTargetPath5(),
+                                rotateVals.get(systemModel.getRotateKey()));
+                        return null;
+                    }
+                }.excuteJob();
+            }
+        });
+    }
+
+    private void initTab4() {
+        bindButtonTextfield("选择源图片文件夹", "必须选择一个文件夹", btnSelectOriginDir4, tfSelectOriginDir4, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setOriginPath4(path);
+            }
+        });
+        bindButtonTextfield("选择目标图片文件夹", "必须选择一个文件夹", btnSelectTargetDir4, tfSelectTargetDir4, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setTargetPath4(path);
+            }
+        });
+    }
+
+    private void initTab3() {
+        bindButtonTextfield("选择源图片文件夹", "必须选择一个文件夹", btnSelectOriginDir3, tfSelectOriginDir3, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setOriginPath3(path);
+            }
+        });
+        bindButtonTextfield("选择目标图片文件夹", "必须选择一个文件夹", btnSelectTargetDir3, tfSelectTargetDir3, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setTargetPath3(path);
+            }
+        });
+
+        tfCropx.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                systemModel.setCropx(Float.parseFloat(newValue));
+                saveModels();
+            }
+        });
+        tfCropy.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                systemModel.setCropy(Float.parseFloat(newValue));
+                saveModels();
+            }
+        });
+        tfCropWidth.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                systemModel.setCropWidth(Float.parseFloat(newValue));
+                saveModels();
+            }
+        });
+        tfCropHeight.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                systemModel.setCropHeight(Float.parseFloat(newValue));
+                saveModels();
+            }
+        });
+
+        btnProgress3.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                new LoadingTask<Void>() {
+                    @Override
+                    public Void onCall() {
+                        mainService.batchCropImage(systemModel.getOriginPath3(),
+                                systemModel.getTargetPath3(),
+                                (int)systemModel.getCropx(),
+                                (int)systemModel.getCropy(),
+                                (int)systemModel.getCropWidth(),
+                                (int)systemModel.getCropHeight());
+                        return null;
+                    }
+                }.excuteJob();
+            }
+        });
+    }
+
+    private void initTab2() {
+        bindButtonTextfield("选择源图片文件夹", "必须选择一个文件夹", btnSelectOriginDir2, tfSelectOriginDir2, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setOriginPath2(path);
+            }
+        });
+        bindButtonTextfield("选择目标图片文件夹", "必须选择一个文件夹", btnSelectTargetDir2, tfSelectTargetDir2, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setTargetPath2(path);
+            }
+        });
+        cpBorder.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Color color = cpBorder.getValue();
+                systemModel.setBorderColor(color);
+                saveModels();
+            }
+        });
+
+        tfPadding.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                systemModel.setImagePadding(Float.parseFloat(newValue));
+                saveModels();
+            }
+        });
+
+        btnProgress2.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                new LoadingTask<Void>() {
+                    @Override
+                    public Void onCall() {
+                        Color c = systemModel.getBorderColor();
+                        java.awt.Color c2 = new java.awt.Color((int) (c.getRed() * 255),
+                                (int) (c.getGreen()* 255),
+                                (int) (c.getBlue()* 255),
+                                (int) (c.getOpacity()* 255));
+                        mainService.batchPad(systemModel.getOriginPath2(),
+                                systemModel.getTargetPath2(), (int)systemModel.getImagePadding(),
+                                c2);
+                        return null;
+                    }
+                }.excuteJob();
+            }
+        });
+    }
+
+    private void initTab1() {
+        bindButtonTextfield("选择源图片文件夹", "必须选择一个文件夹", btnSelectOriginDir1, tfSelectOriginDir1, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setOriginPath1(path);
+            }
+        });
+        bindButtonTextfield("选择目标图片文件夹", "必须选择一个文件夹", btnSelectTargetDir1, tfSelectTargetDir1, new BindButtonCallback() {
+
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setTargetPath1(path);
+            }
+        });
+
+        tfCorner.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                systemModel.setTfCorner(Float.parseFloat(newValue));
+                saveModels();
+            }
+        });
+        btnProgress1.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                new LoadingTask<Void>() {
+                    @Override
+                    public Void onCall() {
+                        mainService.batchCornerImage(systemModel.getOriginPath1(), systemModel.getTargetPath1(), (int) systemModel.getTfCorner());
+                        return null;
+                    }
+                }.excuteJob();
+            }
+        });
+    }
+
+    private void bindButtonTextfield(String title, String notSelectTip, Button btn, TextField tf, BindButtonCallback callback) {
+        btn.setOnAction((ActionEvent e) -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle(title);
+            File file = directoryChooser.showDialog(SvImageToolsApp.getStage());
+            if (null == file) {
+                UIutils.showDialog(notSelectTip);
+                return;
+            }
+            callback.onSetFilePath(file.getAbsolutePath());
+            saveModels();
+            refreshFields();
+        });
+        tf.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                callback.onSetFilePath(newValue);
+                saveModels();
+            }
+        });
+    }
+
     private void initCommon() {
+        rotateKeyArray = new String[]{"旋转90度", "旋转180度", "旋转270度", "水平反转", "竖直反转"};
+        rotateVals = new HashMap<>();
+        rotateVals.put(rotateKeyArray[0], Scalr.Rotation.CW_90);
+        rotateVals.put(rotateKeyArray[1], Scalr.Rotation.CW_180);
+        rotateVals.put(rotateKeyArray[2], Scalr.Rotation.CW_270);
+        rotateVals.put(rotateKeyArray[3], Scalr.Rotation.FLIP_HORZ);
+        rotateVals.put(rotateKeyArray[4], Scalr.Rotation.FLIP_VERT);
+        cbRotate.setItems(FXCollections.observableArrayList(
+                rotateKeyArray[0], rotateKeyArray[1], rotateKeyArray[2], rotateKeyArray[3], rotateKeyArray[4])
+        );
+
+        tabPanel.getSelectionModel().selectedItemProperty().addListener(
+                new ChangeListener<Tab>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
+                        systemModel.setSelectTabIndex(tabPanel.getSelectionModel().getSelectedIndex());
+                        saveModels();
+                    }
+                }
+        );
+        tabPanel.getSelectionModel().select(systemModel.getSelectTabIndex());
         clearProgressBtn.setOnAction((ActionEvent e) -> {
-            new LoadingTask<Void>(){
+            new LoadingTask<Void>() {
                 @Override
                 public Void onCall() {
                     clearGradleTasks();
@@ -143,29 +496,86 @@ public class MainUiController {
                 @Override
                 protected void onDone(Void aVoid) {
                     super.onDone(aVoid);
-                    Platform.runLater(new Runnable(){
+                    Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            UIutils.showDialog("Message","清理进程完成.");
+                            UIutils.showDialog("Message", "清理进程完成.");
                         }
                     });
                 }
             }.excuteJob();
         });
+        refreshFields();
+    }
+
+    private void refreshFields() {
+        try {
+            //批量加圆角
+            tfSelectOriginDir1.setText(systemModel.getOriginPath1());
+            tfSelectTargetDir1.setText(systemModel.getTargetPath1());
+            tfCorner.setText(String.valueOf(systemModel.getTfCorner()));
+
+            //批量加边框
+            tfSelectOriginDir2.setText(systemModel.getOriginPath2());
+            tfSelectTargetDir2.setText(systemModel.getTargetPath2());
+            if (systemModel.getBorderColor() != null) {
+                cpBorder.setValue(systemModel.getBorderColor());
+            }
+            tfPadding.setText(String.valueOf(systemModel.getImagePadding()));
+
+            //批量剪切图片
+            tfSelectOriginDir3.setText(systemModel.getOriginPath3());
+            tfSelectTargetDir3.setText(systemModel.getTargetPath3());
+            tfCropx.setText(String.valueOf(systemModel.getCropx()));
+            tfCropy.setText(String.valueOf(systemModel.getCropy()));
+            tfCropWidth.setText(String.valueOf(systemModel.getCropWidth()));
+            tfCropHeight.setText(String.valueOf(systemModel.getCropHeight()));
+
+            //批量改变图片尺寸
+            tfSelectOriginDir4.setText(systemModel.getOriginPath4());
+            tfSelectTargetDir4.setText(systemModel.getTargetPath4());
+
+            //批量旋转图片
+            tfSelectOriginDir5.setText(systemModel.getOriginPath5());
+            tfSelectTargetDir5.setText(systemModel.getTargetPath5());
+            cbRotate.setValue(systemModel.getRotateKey());
+
+            //批量加滤镜
+            tfSelectOriginDir6.setText(systemModel.getOriginPath6());
+            tfSelectTargetDir6.setText(systemModel.getTargetPath6());
+            cbFilterAnti.setSelected(systemModel.isFilterAnti());
+            cbFilterLight.setSelected(systemModel.isFilterLight());
+            cbFilterDark.setSelected(systemModel.isFilterDarker());
+            cbFilterGray.setSelected(systemModel.isFilterGray());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ;
     }
 
     private void clearGradleTasks() {
         List<JavaProcess> gradleTasks = JavaProcessHelper.findProcessList(SvImageToolsApp.class.getName());
-        for (JavaProcess p: gradleTasks) {
+        for (JavaProcess p : gradleTasks) {
             JavaProcessHelper.killProcess(p.getPid());
         }
     }
 
-    private void log(String text){
+    private void log(String text) {
         ImageUtil.log(text);
     }
 
-    private abstract class LoadingTask<V> extends JobTask<V>{
+    private void saveModels() {
+        new JobTask<Void>() {
+            @Override
+            public Void onCall() {
+                persistenceSaver.saveModel(systemModel, PersistenceSaver.SYSTEM_SAVE_PATH);
+                return null;
+            }
+        }.excuteJob();
+    }
+
+    private abstract class LoadingTask<V> extends JobTask<V> {
         @Override
         protected void onPreCall() {
             super.onPreCall();

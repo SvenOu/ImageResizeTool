@@ -1,1 +1,1 @@
-{"selectTabIndex":1,"logInfo":null}
+{"selectTabIndex":3,"logInfo":null,"originPath1":"C:\\Users\\ghjkl\\Desktop\\课程头图\\背景","targetPath1":"C:\\Users\\ghjkl\\Desktop\\课程头图\\背景2","tfCorner":44.0,"originPath2":"","targetPath2":"","imagePadding":66.0,"originPath3":null,"targetPath3":null,"cropx":0.0,"cropy":0.0,"cropWidth":0.0,"cropHeight":0.0,"originPath4":null,"targetPath4":null,"originPath5":"","targetPath5":"","rotateKey":"水平反转","originPath6":"","targetPath6":"","filterDarker":false,"filterLight":false,"filterAnti":false,"filterGray":false}
