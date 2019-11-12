@@ -17,7 +17,7 @@ public class SvImageToolsApp extends Application {
     public void start(Stage primaryStage) throws Exception{
         stage = primaryStage;
         Parent root = FXMLLoader.load(getClass().getResource("view/mainUi.fxml"));
-        primaryStage.setTitle("运营数据图片配置工具-（作者：SvenOu， 邮箱：ouzhijian@daoran.tv）");
+        primaryStage.setTitle("运营数据图片配置工具 ---（作者：SvenOu， 邮箱：ouzhijian@daoran.tv）");
         primaryStage.setScene(new Scene(root, WIDTH, HEIGHT));
         primaryStage.setResizable(false);
         primaryStage.show();

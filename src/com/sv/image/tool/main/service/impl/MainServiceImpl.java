@@ -91,6 +91,14 @@ public class MainServiceImpl implements MainService {
         File originPathDir = new File(originPath);
         File targetPathDir = new File(targetPath);
 
+        if(originPath == null || originPath.trim().length() <= 0){
+            log("中断操作，源文件夹路径空！");
+            return;
+        }
+        if(targetPath == null || targetPath.trim().length() <= 0){
+            log("中断操作，目标文件路径为空！");
+            return;
+        }
         if(originPathDir.getAbsolutePath().trim().equalsIgnoreCase(targetPathDir.getAbsolutePath().trim())){
             log("中断操作，源文件夹和目标文件夹不能是同一个！");
             return;
