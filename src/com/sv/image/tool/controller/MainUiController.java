@@ -106,6 +106,20 @@ public class MainUiController {
     public CheckBox cbFilterDark;
     public CheckBox cbFilterGray;
 
+    //格式转换
+    public Button btnSelectOriginDir7;
+    public TextField tfSelectOriginDir7;
+    public Button btnSelectTargetDir7;
+    public TextField tfSelectTargetDir7;
+    private ToggleGroup formatGroup;
+    public RadioButton rbFormatPng;
+    public RadioButton rbFormatJpg;
+    public RadioButton rbFormatJpeg;
+    public RadioButton rbFormatBmp;
+    public RadioButton rbFormatGif;
+    public Button btnProgress7;
+
+
     //控制台
     public Button clearProgressBtn;
 
@@ -113,6 +127,7 @@ public class MainUiController {
 
     private MainService mainService;
     private SystemModel systemModel;
+
 
     @FXML
     private void initialize() {
@@ -127,6 +142,47 @@ public class MainUiController {
         initTab4();
         initTab5();
         initTab6();
+        initTab7();
+    }
+
+    private void initTab7() {
+        bindButtonTextfield("选择源图片文件夹", "必须选择一个文件夹", btnSelectOriginDir7, tfSelectOriginDir7, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setOriginPath7(path);
+            }
+        });
+        bindButtonTextfield("选择目标图片文件夹", "必须选择一个文件夹", btnSelectTargetDir7, tfSelectTargetDir7, new BindButtonCallback() {
+            @Override
+            public void onSetFilePath(String path) {
+                systemModel.setTargetPath7(path);
+            }
+        });
+
+        formatGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){
+            @Override
+            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+                RadioButton selectedRadioButton = (RadioButton) newValue;
+                String toogleGroupValue = selectedRadioButton.getText();
+                systemModel.setFormatName(toogleGroupValue);
+                saveModels();
+            }
+        });
+
+        btnProgress7.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                new LoadingTask<Void>() {
+                    @Override
+                    public Void onCall() {
+                        mainService.batchFormatImage(systemModel.getOriginPath7(),
+                                systemModel.getTargetPath7(),
+                                systemModel.getFormatName());
+                        return null;
+                    }
+                }.excuteJob();
+            }
+        });
     }
 
     private void initTab6() {
@@ -528,6 +584,14 @@ public class MainUiController {
             systemModel.setScaleType(scaleTypeKeyArray[0]);
         }
 
+        formatGroup = new ToggleGroup();
+        rbFormatPng.setToggleGroup(formatGroup);
+        rbFormatJpg.setToggleGroup(formatGroup);
+        rbFormatJpeg.setToggleGroup(formatGroup);
+        rbFormatBmp.setToggleGroup(formatGroup);
+        rbFormatGif.setToggleGroup(formatGroup);
+        rbFormatJpg.setSelected(true);
+
         tabPanel.getSelectionModel().selectedItemProperty().addListener(
                 new ChangeListener<Tab>() {
                     @Override
@@ -604,6 +668,10 @@ public class MainUiController {
             cbFilterLight.setSelected(systemModel.isFilterLight());
             cbFilterDark.setSelected(systemModel.isFilterDarker());
             cbFilterGray.setSelected(systemModel.isFilterGray());
+
+            //格式转换
+            tfSelectOriginDir7.setText(systemModel.getOriginPath7());
+            tfSelectTargetDir7.setText(systemModel.getTargetPath7());
 
         } catch (Exception e) {
             e.printStackTrace();

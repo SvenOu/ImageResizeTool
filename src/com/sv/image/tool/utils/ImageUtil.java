@@ -9,6 +9,8 @@ import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -21,9 +23,10 @@ public class ImageUtil {
     public static final String FILE_SEPARATION_DOT = ".";
     public static final String PNG = "png";
     public static final String JPG = "jpg";
-    public static final String BMP = "bmp";
     public static final String JPEG = "jpeg";
+    public static final String BMP = "bmp";
     public static final String GIF = "gif";
+    public static final String WBMP = "wbmp";
 
     private static ImageToolModel imageToolModel;
     private static WeakReference<TextArea> consoleTaWr;
@@ -32,6 +35,34 @@ public class ImageUtil {
             imageToolModel = new ImageToolModel();
         }
         consoleTaWr = new WeakReference<>(consoleTa);
+    }
+
+    /**
+     * Converts an image to another format
+     *
+     * @param inputImagePath Path of the source image
+     * @param outputImagePath Path of the destination image
+     * @param formatName the format to be converted to, one of: jpeg, png,
+     * bmp, wbmp, and gif
+     * @return true if successful, false otherwise
+     * @throws IOException if errors occur during writing
+     */
+    public static boolean convertFormat(String inputImagePath,
+                                        String outputImagePath, String formatName) throws IOException {
+        FileInputStream inputStream = new FileInputStream(inputImagePath);
+        FileOutputStream outputStream = new FileOutputStream(outputImagePath);
+
+        // reads input image from file
+        BufferedImage inputImage = ImageIO.read(inputStream);
+
+        // writes to the output image in specified format
+        boolean result = ImageIO.write(inputImage, formatName, outputStream);
+
+        // needs to close the streams
+        outputStream.close();
+        inputStream.close();
+
+        return result;
     }
 
     public static void log(String text) {
@@ -44,8 +75,12 @@ public class ImageUtil {
         System.out.print(text + '\n');
     }
 
-    public static  String convertToPngPath(String path) {
-        if(path == null || path.length() <=0){
+    public static String convertToPngPath(String path) {
+        return convertToFormatPath(path, PNG);
+    }
+
+    public static String convertToFormatPath(String path, String formatName) {
+        if(path == null || path.length() <= 0){
             return null;
         }
         if(!path.contains(FILE_SEPARATION_DOT)){
@@ -53,7 +88,7 @@ public class ImageUtil {
         }
         int index = path.lastIndexOf(FILE_SEPARATION_DOT);
         String temp = path.substring(0, index);
-        return temp + FILE_SEPARATION_DOT + PNG;
+        return temp + FILE_SEPARATION_DOT + formatName;
     }
 
     public static void replaceSourceFileInfoRootPath(SourceFileInfo infos, String rootPath, String replaceRootPath) {

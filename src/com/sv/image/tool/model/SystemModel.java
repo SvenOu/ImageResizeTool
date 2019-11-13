@@ -1,10 +1,8 @@
 package com.sv.image.tool.model;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.scene.paint.Color;
 
-
-public class SystemModel{
+public class SystemModel {
     private int selectTabIndex;
 
     //批量加圆角
@@ -47,6 +45,11 @@ public class SystemModel{
     private boolean isFilterLight;
     private boolean isFilterDarker;
     private boolean isFilterGray;
+
+    // 格式转换
+    private String originPath7;
+    private String targetPath7;
+    private String formatName;
 
     public String getOriginPath1() {
         return originPath1;
@@ -278,5 +281,29 @@ public class SystemModel{
 
     public void setResizeHeight(float resizeHeight) {
         this.resizeHeight = resizeHeight;
+    }
+
+    public String getOriginPath7() {
+        return originPath7;
+    }
+
+    public void setOriginPath7(String originPath7) {
+        this.originPath7 = originPath7;
+    }
+
+    public String getTargetPath7() {
+        return targetPath7;
+    }
+
+    public void setTargetPath7(String targetPath7) {
+        this.targetPath7 = targetPath7;
+    }
+
+    public String getFormatName() {
+        return formatName;
+    }
+
+    public void setFormatName(String formatName) {
+        this.formatName = formatName;
     }
 }

@@ -41,4 +41,9 @@ public interface MainService extends Service {
      */
     void batchRotateImage(String originPath, String targetPath, Scalr.Rotation rotation,
                           BufferedImageOp... ops);
+    /**
+     *
+     * 批量格式转换图片
+     */
+    void batchFormatImage(String originPath, String targetPath, String formatName);
 }

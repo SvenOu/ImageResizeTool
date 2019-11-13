@@ -84,6 +84,29 @@ public class MainServiceImpl implements MainService {
         });
     }
 
+    @Override
+    public void batchFormatImage(String originPath, String targetPath, String formatName) {
+        batchAction(originPath, targetPath, new SourcefileInfoCallback() {
+            @Override
+            public BufferedImage progress(SourceFileInfo sourceFileInfo, BufferedImage image) {
+                String targetFilePath = ImageUtil.convertToFormatPath(sourceFileInfo.getPath(), formatName);
+                File targetFile = new File(targetFilePath);
+                try {
+                    if(!targetFile.getParentFile().exists()){
+                        targetFile.getParentFile().mkdirs();
+                    }
+                    if(!targetFile.exists()){
+                        targetFile.createNewFile();
+                    }
+                    ImageUtil.convertFormat(sourceFileInfo.getOriginPath(), targetFilePath, formatName);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
+    }
+
     /**
      * 批量处理图片
      */
@@ -146,6 +169,7 @@ public class MainServiceImpl implements MainService {
                     || trimExt.equalsIgnoreCase(ImageUtil.BMP)
                     || trimExt.equalsIgnoreCase(ImageUtil.JPEG)
                     || trimExt.equalsIgnoreCase(ImageUtil.GIF)
+                    || trimExt.equalsIgnoreCase(ImageUtil.WBMP)
             ){
                 isImageType = true;
                 return isImageType;
@@ -170,8 +194,9 @@ public class MainServiceImpl implements MainService {
             BufferedImage image = ImageIO.read(originFile.toFile());
 
             BufferedImage scaledImg = callback.progress(sourceFileInfo, image);
-
-            ImageUtil.write(scaledImg, targetFile.toFile());
+            if(scaledImg != null){
+                ImageUtil.write(scaledImg, targetFile.toFile());
+            }
         } catch (IOException e) {
             e.printStackTrace();
             log(e.getMessage());
