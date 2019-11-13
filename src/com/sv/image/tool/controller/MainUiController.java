@@ -127,45 +127,6 @@ public class MainUiController {
         initTab4();
         initTab5();
         initTab6();
-
-        new LoadingTask<Void>() {
-
-            @Override
-            public Void onCall() {
-
-//                mainService.batchCornerImage("C:\\Users\\ghjkl\\Desktop\\课程头图\\背景",
-//                        "C:\\Users\\ghjkl\\Desktop\\课程头图\\背景3",
-//                        100);
-
-//                int pad = 8;
-//                Color alpha = new Color(255, 50, 255, 0);
-//                mainService.batchPad("C:\\Users\\ghjkl\\Desktop\\课程头图\\背景",
-//                        "C:\\Users\\ghjkl\\Desktop\\课程头图\\背景2",
-//                        pad, alpha);
-
-                // 抗锯齿， 较亮， 较暗， 变灰
-//                mainService.batchApplyImage("C:\\Users\\ghjkl\\Desktop\\课程头图\\背景",
-//                        "C:\\Users\\ghjkl\\Desktop\\课程头图\\背景3",
-//                        Scalr.OP_ANTIALIAS, OP_BRIGHTER, OP_DARKER,
-//                        OP_GRAYSCALE);
-
-//                mainService.batchCropImage("C:\\Users\\ghjkl\\Desktop\\课程头图\\背景",
-//                        "C:\\Users\\ghjkl\\Desktop\\课程头图\\背景3",
-//                        10, 10, 100, 100);
-
-//                mainService.batchResizeImage("C:\\Users\\ghjkl\\Desktop\\课程头图\\背景",
-//                        "C:\\Users\\ghjkl\\Desktop\\课程头图\\背景3",
-//                        Scalr.Method.SPEED, Scalr.Mode.FIT_EXACT, 640, 640);
-
-//                mainService.batchRotateImage("C:\\Users\\ghjkl\\Desktop\\课程头图\\背景",
-//                        "C:\\Users\\ghjkl\\Desktop\\课程头图\\背景3",
-//                        Scalr.Rotation.CW_270);
-
-                return null;
-            }
-
-        }.excuteJob();
-
     }
 
     private void initTab6() {
