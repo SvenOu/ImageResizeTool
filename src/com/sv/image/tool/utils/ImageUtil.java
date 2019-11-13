@@ -25,8 +25,8 @@ public class ImageUtil {
     public static final String JPG = "jpg";
     public static final String JPEG = "jpeg";
     public static final String BMP = "bmp";
-    public static final String GIF = "gif";
     public static final String WBMP = "wbmp";
+    public static final String GIF = "gif";
 
     private static ImageToolModel imageToolModel;
     private static WeakReference<TextArea> consoleTaWr;
