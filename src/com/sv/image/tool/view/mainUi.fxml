@@ -302,7 +302,7 @@
                     </content>
                 </Tab>
 
-                <Tab closable="false" text="格式转换">
+                <Tab closable="false" text="批量格式转换">
                     <content>
                         <VBox>
                             <HBox alignment="CENTER_LEFT" spacing="10">
