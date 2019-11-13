@@ -120,8 +120,10 @@ public class MainServiceImpl implements MainService {
             return;
         }
         if(sourceFileInfo.isLeaf()){
-            progressSaveSourceFileInfo(sourceFileInfo, callback);
             log(sourceFileInfo.getPath());
+            if(isImage(sourceFileInfo)){
+                progressSaveSourceFileInfo(sourceFileInfo, callback);
+            }
             return;
         }
         log(sourceFileInfo.getPath());
@@ -132,6 +134,24 @@ public class MainServiceImpl implements MainService {
                 iteraterSourceFileInfo(child, callback);
             }
         }
+    }
+
+    private boolean isImage(SourceFileInfo sourceFileInfo) {
+        boolean isImageType = false;
+        String ext = ImageUtil.getFileExtension(new File(sourceFileInfo.getPath()));
+        String trimExt = ext.trim();
+        if(trimExt.length() >0){
+            if(trimExt.equalsIgnoreCase(ImageUtil.PNG)
+                    || trimExt.equalsIgnoreCase(ImageUtil.JPG)
+                    || trimExt.equalsIgnoreCase(ImageUtil.BMP)
+                    || trimExt.equalsIgnoreCase(ImageUtil.JPEG)
+                    || trimExt.equalsIgnoreCase(ImageUtil.GIF)
+            ){
+                isImageType = true;
+                return isImageType;
+            }
+        }
+        return isImageType;
     }
 
     /**

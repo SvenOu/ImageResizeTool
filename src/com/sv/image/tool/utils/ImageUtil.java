@@ -20,6 +20,10 @@ public class ImageUtil {
     public static final String PATH_SEPARATOR = "/";
     public static final String FILE_SEPARATION_DOT = ".";
     public static final String PNG = "png";
+    public static final String JPG = "jpg";
+    public static final String BMP = "bmp";
+    public static final String JPEG = "jpeg";
+    public static final String GIF = "gif";
 
     private static ImageToolModel imageToolModel;
     private static WeakReference<TextArea> consoleTaWr;
@@ -127,13 +131,17 @@ public class ImageUtil {
 
     public static String getFileExtension(File file) {
         String fileName = file.getName();
+        return getFileExtension(fileName);
+    }
+
+    public static String getFileExtension(String fileName) {
         if(fileName.lastIndexOf(FILE_SEPARATION_DOT) != -1 && fileName.lastIndexOf(FILE_SEPARATION_DOT) != 0) {
             return fileName.substring(fileName.lastIndexOf(FILE_SEPARATION_DOT)+1);
         } else {
             return "";
         }
     }
-    
+
     public static BufferedImage makeRoundedCorner(BufferedImage image, int cornerRadius) {
         int w = image.getWidth();
         int h = image.getHeight();
