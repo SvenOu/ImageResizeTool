@@ -76,6 +76,14 @@ public class MainUiController {
     public Button btnSelectTargetDir4;
     public TextField tfSelectTargetDir4;
     public Button btnProgress4;
+    public ChoiceBox<String> cbQualityMode;
+    public ChoiceBox<String> cbScaleType;
+    public TextField tfResizeWidth;
+    public TextField tfResizeHeight;
+    private String[] qualityKeyArray;
+    private HashMap<String, Scalr.Method> qualityVals;
+    private String[] scaleTypeKeyArray;
+    private HashMap<String, Scalr.Mode> scaleTypeVals;
 
     //批量旋转图片
     public Button btnSelectOriginDir5;
@@ -209,20 +217,20 @@ public class MainUiController {
                     @Override
                     public Void onCall() {
                         List<BufferedImageOp> filters = new ArrayList();
-                        if(systemModel.isFilterAnti()){
+                        if (systemModel.isFilterAnti()) {
                             filters.add(Scalr.OP_ANTIALIAS);
                         }
-                        if(systemModel.isFilterLight()){
+                        if (systemModel.isFilterLight()) {
                             filters.add(Scalr.OP_BRIGHTER);
                         }
-                        if(systemModel.isFilterDarker()){
+                        if (systemModel.isFilterDarker()) {
                             filters.add(Scalr.OP_DARKER);
                         }
-                        if(systemModel.isFilterGray()){
+                        if (systemModel.isFilterGray()) {
                             filters.add(Scalr.OP_GRAYSCALE);
                         }
                         BufferedImageOp[] array = new BufferedImageOp[filters.size()];
-                        for(int i =0; i< filters.size(); i++){
+                        for (int i = 0; i < filters.size(); i++) {
                             BufferedImageOp op = filters.get(i);
                             array[i] = op;
                         }
@@ -290,6 +298,60 @@ public class MainUiController {
                 systemModel.setTargetPath4(path);
             }
         });
+
+        cbQualityMode.getSelectionModel().selectedIndexProperty()
+                .addListener(new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                        String key = qualityKeyArray[(int) newValue];
+                        systemModel.setQualityMode(key);
+                        saveModels();
+                    }
+                });
+        cbScaleType.getSelectionModel().selectedIndexProperty()
+                .addListener(new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                        String key = scaleTypeKeyArray[(int) newValue];
+                        systemModel.setScaleType(key);
+                        saveModels();
+                    }
+                });
+
+        tfResizeWidth.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                systemModel.setResizeWidth(Float.parseFloat(newValue));
+                saveModels();
+            }
+        });
+
+        tfResizeHeight.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                systemModel.setResizeHeight(Float.parseFloat(newValue));
+                saveModels();
+            }
+        });
+
+        btnProgress4.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                new LoadingTask<Void>() {
+                    @Override
+                    public Void onCall() {
+                        mainService.batchResizeImage(systemModel.getOriginPath4(),
+                                systemModel.getTargetPath4(),
+                                qualityVals.get(systemModel.getQualityMode()),
+                                scaleTypeVals.get(systemModel.getScaleType()),
+                                (int) systemModel.getResizeWidth(),
+                                (int) systemModel.getResizeHeight());
+                        return null;
+                    }
+                }.excuteJob();
+            }
+        });
+
     }
 
     private void initTab3() {
@@ -343,10 +405,10 @@ public class MainUiController {
                     public Void onCall() {
                         mainService.batchCropImage(systemModel.getOriginPath3(),
                                 systemModel.getTargetPath3(),
-                                (int)systemModel.getCropx(),
-                                (int)systemModel.getCropy(),
-                                (int)systemModel.getCropWidth(),
-                                (int)systemModel.getCropHeight());
+                                (int) systemModel.getCropx(),
+                                (int) systemModel.getCropy(),
+                                (int) systemModel.getCropWidth(),
+                                (int) systemModel.getCropHeight());
                         return null;
                     }
                 }.excuteJob();
@@ -392,11 +454,11 @@ public class MainUiController {
                     public Void onCall() {
                         Color c = systemModel.getBorderColor();
                         java.awt.Color c2 = new java.awt.Color((int) (c.getRed() * 255),
-                                (int) (c.getGreen()* 255),
-                                (int) (c.getBlue()* 255),
-                                (int) (c.getOpacity()* 255));
+                                (int) (c.getGreen() * 255),
+                                (int) (c.getBlue() * 255),
+                                (int) (c.getOpacity() * 255));
                         mainService.batchPad(systemModel.getOriginPath2(),
-                                systemModel.getTargetPath2(), (int)systemModel.getImagePadding(),
+                                systemModel.getTargetPath2(), (int) systemModel.getImagePadding(),
                                 c2);
                         return null;
                     }
@@ -474,6 +536,36 @@ public class MainUiController {
         cbRotate.setItems(FXCollections.observableArrayList(
                 rotateKeyArray[0], rotateKeyArray[1], rotateKeyArray[2], rotateKeyArray[3], rotateKeyArray[4])
         );
+        if (systemModel.getRotateKey() == null) {
+            systemModel.setRotateKey(rotateKeyArray[0]);
+        }
+
+        qualityKeyArray = new String[]{"自动", "快速", "平衡", "质量", "最高质量"};
+        qualityVals = new HashMap<>();
+        qualityVals.put(qualityKeyArray[0], Scalr.Method.AUTOMATIC);
+        qualityVals.put(qualityKeyArray[1], Scalr.Method.SPEED);
+        qualityVals.put(qualityKeyArray[2], Scalr.Method.BALANCED);
+        qualityVals.put(qualityKeyArray[3], Scalr.Method.QUALITY);
+        qualityVals.put(qualityKeyArray[4], Scalr.Method.ULTRA_QUALITY);
+        cbQualityMode.setItems(FXCollections.observableArrayList(
+                qualityKeyArray[0], qualityKeyArray[1], qualityKeyArray[2], qualityKeyArray[3], qualityKeyArray[4])
+        );
+        if (systemModel.getQualityMode() == null) {
+            systemModel.setQualityMode(qualityKeyArray[0]);
+        }
+
+        scaleTypeKeyArray = new String[]{"自动", "精确", "宽度优先", "高度优先"};
+        scaleTypeVals = new HashMap<>();
+        scaleTypeVals.put(scaleTypeKeyArray[0], Scalr.Mode.AUTOMATIC);
+        scaleTypeVals.put(scaleTypeKeyArray[1], Scalr.Mode.FIT_EXACT);
+        scaleTypeVals.put(scaleTypeKeyArray[2], Scalr.Mode.FIT_TO_WIDTH);
+        scaleTypeVals.put(scaleTypeKeyArray[3], Scalr.Mode.FIT_TO_HEIGHT);
+        cbScaleType.setItems(FXCollections.observableArrayList(
+                scaleTypeKeyArray[0], scaleTypeKeyArray[1], scaleTypeKeyArray[2], scaleTypeKeyArray[3])
+        );
+        if (systemModel.getScaleType() == null) {
+            systemModel.setScaleType(scaleTypeKeyArray[0]);
+        }
 
         tabPanel.getSelectionModel().selectedItemProperty().addListener(
                 new ChangeListener<Tab>() {
@@ -534,6 +626,10 @@ public class MainUiController {
             //批量改变图片尺寸
             tfSelectOriginDir4.setText(systemModel.getOriginPath4());
             tfSelectTargetDir4.setText(systemModel.getTargetPath4());
+            cbQualityMode.setValue(systemModel.getQualityMode());
+            cbScaleType.setValue(systemModel.getScaleType());
+            tfResizeWidth.setText(String.valueOf(systemModel.getResizeWidth()));
+            tfResizeHeight.setText(String.valueOf(systemModel.getResizeHeight()));
 
             //批量旋转图片
             tfSelectOriginDir5.setText(systemModel.getOriginPath5());

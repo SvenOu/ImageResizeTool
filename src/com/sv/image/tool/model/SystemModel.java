@@ -31,6 +31,10 @@ public class SystemModel{
     //批量改变图片尺寸
     private String originPath4;
     private String targetPath4;
+    private String qualityMode;
+    private String scaleType;
+    private float resizeWidth;
+    private float resizeHeight;
 
     //批量旋转图片
     private String originPath5;
@@ -251,5 +255,37 @@ public class SystemModel{
 
     public void setFilterGray(boolean filterGray) {
         isFilterGray = filterGray;
+    }
+
+    public String getQualityMode() {
+        return qualityMode;
+    }
+
+    public void setQualityMode(String qualityMode) {
+        this.qualityMode = qualityMode;
+    }
+
+    public String getScaleType() {
+        return scaleType;
+    }
+
+    public void setScaleType(String scaleType) {
+        this.scaleType = scaleType;
+    }
+
+    public float getResizeWidth() {
+        return resizeWidth;
+    }
+
+    public void setResizeWidth(float resizeWidth) {
+        this.resizeWidth = resizeWidth;
+    }
+
+    public float getResizeHeight() {
+        return resizeHeight;
+    }
+
+    public void setResizeHeight(float resizeHeight) {
+        this.resizeHeight = resizeHeight;
     }
 }
