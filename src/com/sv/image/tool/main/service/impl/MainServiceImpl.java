@@ -154,6 +154,7 @@ public class MainServiceImpl implements MainService {
             ImageUtil.write(scaledImg, targetFile.toFile());
         } catch (IOException e) {
             e.printStackTrace();
+            log(e.getMessage());
         }
     }
 

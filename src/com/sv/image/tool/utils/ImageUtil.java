@@ -36,7 +36,7 @@ public class ImageUtil {
         assert textArea != null;
         imageToolModel.addLogInfo(text);
         textArea.setText(imageToolModel.getLogInfo());
-        textArea.setScrollTop(999999);
+        textArea.setScrollTop(9999999);
         System.out.print(text + '\n');
     }
 
