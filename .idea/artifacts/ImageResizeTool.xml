@@ -14,6 +14,9 @@
     <root id="root">
       <element id="archive" name="ImageResizeTool.jar">
         <element id="module-output" name="ImageResizeTool" />
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="libs" />
+        </element>
       </element>
     </root>
   </artifact>

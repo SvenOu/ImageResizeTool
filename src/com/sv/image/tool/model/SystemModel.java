@@ -2,11 +2,10 @@ package com.sv.image.tool.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.scene.paint.Color;
-import org.imgscalr.Scalr;
+
 
 public class SystemModel{
     private int selectTabIndex;
-    private String logInfo;
 
     //批量加圆角
     private String originPath1;
@@ -159,14 +158,6 @@ public class SystemModel{
 
     public void setTargetPath6(String targetPath6) {
         this.targetPath6 = targetPath6;
-    }
-
-    public String getLogInfo() {
-        return logInfo;
-    }
-
-    public void setLogInfo(String logInfo) {
-        this.logInfo = logInfo;
     }
 
     public Color getBorderColor() {
